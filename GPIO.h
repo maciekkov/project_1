@@ -23,25 +23,25 @@ public:
     GPIO();
     GPIO(const unsigned int gpioNum);
     GPIO(const string& gpioNum):_gpioNum(gpioNum){}
-    virtual ~GPIO()
+    virtual ~GPIO();
 
     void initGpio(const string& data);
 /*!
 Zestaw API do odczytu/zapisu interfejsu u¿ytkownika wystawionego przez Kernel
 */
 
-    int Gexport()const;
-    int Gdirection(const string& data)const;
-    int GsetValue(unsigned int num)const;
-    int GsetEdge(const string& mode)const;
-    int GgetValue()const;
-    int Gunexport()const;
+    int Gexport();
+    int Gdirection(const string& data);
+    int GsetValue(unsigned int num);
+    int GsetEdge(const string& mode);
+    int GgetValue();
+    int Gunexport();
 
 private:
-    string toString(unsigned int num)const;
-    int openFile(const string& path, unsigned int mode, const string& data)const;
+    string toString(unsigned int num);
+    int openFile(const string& path, unsigned int mode, const string& data);
 
-  const string _gpioNum;
+	string _gpioNum;
 };
 
 #endif // GPIO_H

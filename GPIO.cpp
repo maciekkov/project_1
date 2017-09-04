@@ -22,13 +22,13 @@ GPIO::~GPIO()
     //dtor
 }
 
-void GPIO::initGpio(const string& data)const
+void GPIO::initGpio(const string& data)
 {
     Gexport();
     Gdirection(data);
 }
 
-int GPIO::Gexport()const
+int GPIO::Gexport()
 {
     string path = "/export";
     if(openFile(path, WRITE, _gpioNum) < 0)
@@ -39,7 +39,7 @@ int GPIO::Gexport()const
     return 1;
 }
 
-int GPIO::Gdirection(const string& data)const
+int GPIO::Gdirection(const string& data)
 {
     string path = "/gpio" + _gpioNum + "/direction";
     if(openFile(path, WRITE, data) < 0)
@@ -50,7 +50,7 @@ int GPIO::Gdirection(const string& data)const
     return 1;
 }
 
-int GPIO::GsetValue(int num)const
+int GPIO::GsetValue(unsigned int num)
 {
     string path = "/gpio" + _gpioNum + "/value";
     if(openFile(path, WRITE, toString(num)) < 0)
@@ -61,7 +61,7 @@ int GPIO::GsetValue(int num)const
     return 1;
 }
 
-int GPIO::GsetEdge(const string& type)const
+int GPIO::GsetEdge(const string& type)
 {
     string path = "/gpio" + _gpioNum + "/edge";
     if(openFile(path, WRITE, type) < 0)
@@ -72,11 +72,12 @@ int GPIO::GsetEdge(const string& type)const
     return 1;
 }
 
-int GPIO::GgetValue()const
+int GPIO::GgetValue() 
 {
     string path = "/gpio" + _gpioNum + "/value";
-    int value = 0;
-    value = openFile(path, READ);
+    int value;
+    
+    value = openFile(path, READ,"");
     if(value < 0)
     {
         perror("error value");
@@ -85,7 +86,7 @@ int GPIO::GgetValue()const
     return value;
 }
 
-int GPIO::Gunexport()const
+int GPIO::Gunexport()
 {
     string path = "/unexport";
     if(openFile(path, WRITE, _gpioNum) < 0)
@@ -96,15 +97,14 @@ int GPIO::Gunexport()const
     return 1;
 }
 
-string GPIO::toString(unsigned int num)const
+string GPIO::toString(unsigned int num)
 {
-    string bufor;
     stringstream ss;
     ss << num;
     return ss.str();
 }
 
-int GPIO::openFile(const string& path, unsigned int modee, const string& data = "")const
+int GPIO::openFile(const string& path, unsigned int modee, const string& data = "")
 {
     fstream fd;
     string value;

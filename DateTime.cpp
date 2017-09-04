@@ -6,25 +6,25 @@ using namespace std;
 DateTime::DateTime()
 {
     _now = time(NULL);
-    _t = localtime(&now);
+    _t = localtime(&_now);
 }
 
-inline int DateTime::getSeconds()const
+int DateTime::getSeconds()const
 {
     return _t->tm_sec;
 }
 
-inline int DateTime::getMinuts()const
+int DateTime::getMinuts()const
 {
     return _t->tm_min;
 }
 
-inline int DateTime::getHours()const
+int DateTime::getHours()const
 {
     return _t->tm_hour;
 }
 
-inline int DateTime::getDays()const
+int DateTime::getDays()const
 {
     return _t->tm_mday;
 }
@@ -34,20 +34,20 @@ inline int DateTime::getMonths()const
     return _t->tm_mon;
 }
 
-inline int DateTime::getYear()const
+int DateTime::getYear()const
 {
     return _t->tm_year + YEARS;
 }
 
 inline int DateTime::getTimeticks()const
 {
-    return (int) now;
+    return (int) _now;
 }
 
-inline void DateTime::refreash()
+void DateTime::refreash()
 {
     _now = time(0);
-    _t = localtime(&now);
+    _t = localtime(&_now);
 }
 
 string DateTime::getTime()
@@ -75,11 +75,11 @@ string DateTime::toString(int num)const
 
 ostream& DateTime::logUpdate(const string& text, const char* fileName)
 {
-    f.open(fileName, ios::app);
-    if(f.good())
+    _f.open(fileName, ios::app);
+    if(_f.good())
     {
-        f << "[ " + getDate() + " " + getTime() + "] -> " + text << endl;
-        f.close();
+        _f << "[ " + getDate() + " " + getTime() + "] -> " + text << endl;
+        _f.close();
     }
     else
     {

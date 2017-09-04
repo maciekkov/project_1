@@ -4,8 +4,8 @@ using namespace std;
 
 BME280::BME280()
 {
-    raw = new bme280_raw_data{0};
-    cal = new bme280_calib_data{0};
+    _raw = new bme280_raw_data{0};
+    _cal = new bme280_calib_data{0};
     configSensor();
 }
 
@@ -17,7 +17,7 @@ void BME280::configSensor()
         perror("Device not found");
         exit(1);
     }
-    readCalibrationData(fd, cal);
+    readCalibrationData(fd, _cal);
     wiringPiI2CWriteReg8(fd, 0xf2, 0x02);   // humidity oversampling x 1
     wiringPiI2CWriteReg8(fd, 0xf4, 0x25);   // pressure and temperature oversampling x 1, mode normal
 }
@@ -32,11 +32,11 @@ tuple<double,double,double> BME280::readSensor()
 		 wiringPiI2CWriteReg8(fd, 0xf2, 0x02);   // humidity oversampling x 1
          wiringPiI2CWriteReg8(fd, 0xf4, 0x25);   // pressure and temperature oversampling x 1, mode normal
 
-	     getRawData(fd, raw);
-	     t_fine  =  getTemperatureCalibration(cal, raw->temperature);
+	     getRawData(fd,_raw);
+	     t_fine  =  getTemperatureCalibration(_cal, _raw->temperature);
 	     float t = compensateTemperature(t_fine);
-	     float h = compensateHumidity(raw->humidity, cal, t_fine);
-	     float p = compensatePressure(raw->pressure, cal, t_fine) / 100; // hPa
+	     float h = compensateHumidity(_raw->humidity, _cal, t_fine);
+	     float p = compensatePressure(_raw->pressure, _cal, t_fine) / 100; // hPa
 	   	 this_thread::sleep_for(chrono::seconds(1));
 
 	     return make_tuple(t, h, p);

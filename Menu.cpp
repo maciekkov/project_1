@@ -2,7 +2,7 @@
 
 using namespace std;
 
-Menu::Menu(string name = "WEATHER")
+Menu::Menu(const string& name)
 {
     _menuName = name;
     _wiersz.push_back(Wiersz("TIME", 1));
@@ -12,19 +12,23 @@ Menu::Menu(string name = "WEATHER")
     _wiersz.push_back(Wiersz("MAKE RAPORT", 5));
     _wiersz.push_back(Wiersz("EXIT", 6));
 }
-inline string Menu::getVectorName(int num)const
+
+string Menu::getVectorName(int num)
 {
     return _wiersz[num].getWierszName();
 }
-inline string Menu::getMenuName()const
+
+string Menu::getMenuName()
 {
     return _menuName;
 }
-inline int Menu::getVectorID(int num)const
+
+int Menu::getVectorID(int num)
 {
     return _wiersz[num].getNumID();
 }
-inline int Menu::getSizeVector()const
+
+int Menu::getSizeVector()
 {
     return _wiersz.size();
 }

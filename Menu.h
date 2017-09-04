@@ -13,12 +13,12 @@ using namespace std;
 class Menu
 {
 public:
-	Menu();
-	Menu(string name);
-	string getVectorName(int num)const;
-	string getMenuName()const;
-	int getVectorID(int num)const;
-	int getSizeVector()const;
+	Menu(const string& name = "WEATHER");
+	virtual ~Menu(){}
+	string getVectorName(int num);
+	string getMenuName();
+	int getVectorID(int num);
+	int getSizeVector();
 private:
 	string _menuName;
 	vector<Wiersz>_wiersz;

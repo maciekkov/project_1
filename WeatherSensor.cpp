@@ -2,7 +2,7 @@
 #include "WeatherSensor.h"
 
 using namespace std;
-_flag24Hours
+
 WeatherSensor::WeatherSensor()
 {
     _hourRaport.resize(COL);
@@ -21,19 +21,21 @@ WeatherSensor::~WeatherSensor()
     delete[] _tab;
 }
 
-TStatus WeatherSensor::runThreadCollectData() override
+int WeatherSensor::runThreadCollectData() 
 {
    _thread = thread(&WeatherSensor::collectData, this);
-   return TStatus OK;
+   return 1;
 }
 
-TStatus stopThreadCollectData() override
+int WeatherSensor::stopThreadCollectData() 
 {
-    _stopThread = true;
-    return TStatus OK;
+    BusyWaitThreadInterface::_stopThread = true;
+    if(_thread.joinable())
+		_thread.join();
+    return 1;
 }
 
-string WeatherSensor::getAvg(const vector<tuple<double, int, int> >& data, int num)const
+string WeatherSensor::getAvg(const vector<tuple<double, int, int> >& data, int num)
 {
     double tsuma = 0, hsuma = 0, psuma = 0;
     for(uint i = data.size(); i > 0; --i)
@@ -49,17 +51,17 @@ string WeatherSensor::getAvg(const vector<tuple<double, int, int> >& data, int n
     return buffor;
 }
 
-string WeatherSensor::getDataForEachHour(int i)const
+string WeatherSensor::getDataForEachHour(int i)
 {
-    double	  tsuma = get<0>(_HourRaport[i]);
-    double	  hsuma = get<1>(_HourRaport[i]);
-    double	  psuma = get<2>(_HourRaport[i]);
+    double	  tsuma = get<0>(_hourRaport[i]);
+    double	  hsuma = get<1>(_hourRaport[i]);
+    double	  psuma = get<2>(_hourRaport[i]);
 
     string buffor = "Temp:" + toString(tsuma)+"     Hum:" + toString(hsuma) + " Press:" + toString(psuma);
     return buffor;
 }
 
-string WeatherSensor::getCurrentParam()const
+string WeatherSensor::getCurrentParam()
 {
     double	  tsuma = get<0>(_secRaport.back());
     double	  hsuma = get<1>(_secRaport.back());
@@ -69,38 +71,43 @@ string WeatherSensor::getCurrentParam()const
     return buffor;
 }
 
-void WeatherSensor::make24HRaport()const
+void WeatherSensor::make24HRaport()
 {
     string bufor;
-    for(uint i = 0; i <_HourRaport.size(); ++i)
+    for(uint i = 0; i <_hourRaport.size(); ++i)
     {
         bufor = getDataForEachHour(i);
         log.logUpdate(bufor, LOG_FILE_DAILY);
     }
 }
 
-void WeatherSensor::makeRaportNow()const
+void WeatherSensor::makeRaportNow()
 {
     string bufor = getCurrentParam();
     log.logUpdate(bufor, LOG_FILE_INSTANT);
 }
 
-inline void WeatherSensor::mailRaport()const
+void WeatherSensor::mailRaport()
 {
     system( "echo \"Sending an attachment of daily rapport.\" | mutt -a /home/pi/Desktop/project_1/logfile.txt -a /home/pi/Desktop/project_1/TempChart.txt -s\"Raport Sensor\" -c maciekkov@gmail.com");
+}
+
+bool WeatherSensor::getThreadFlag()
+{
+	return _stopThread;
 }
 
 void WeatherSensor::printSchema()
 {
     for(uint32_t s = 0; s < ROW; ++s)
     {
-        uint32_t num = (int)get<0>(_HourRaport[s]);
+        uint32_t num = (int)get<0>(_hourRaport[s]);
         for(uint32_t k = 0; k < COL; ++k)
         {
             if(num == k)
-                tab[k][s] = 'x';
+                _tab[k][s] = 'x';
             else
-                tab[k][s] = ' ';
+                _tab[k][s] = ' ';
         }
     }
 
@@ -118,9 +125,9 @@ void WeatherSensor::printSchema()
             for(uint32_t k = 0; k < COL; ++k)
             {
                 if(k%10 != 0)
-                    f << " " << tab[i][k];
+                    f << " " << _tab[i][k];
                 else
-                    f << "" << tab[i][k];
+                    f << "" << _tab[i][k];
             }
             f << endl;
         }
@@ -145,7 +152,7 @@ void WeatherSensor::collectData()
     {
         auto date = BME280::readSensor();
         _secRaport.push_back(date);
-        if(CountTime(_startHour, FREQUENCY_TIME_RAPORT))
+        if(countTime(_startHour, FREQUENCY_TIME_RAPORT))
         {
             _hourRaport[log.getMinuts()] = date;
             _startHour = time(NULL);
@@ -158,7 +165,7 @@ void WeatherSensor::collectData()
     }
 }
 
-bool WeatherSensor::CountTime(const time_t start, int option)
+bool WeatherSensor::countTime(const time_t start, int option)
 {
     time_t stop = time(NULL);
     time_t counter = stop - start;
@@ -175,7 +182,7 @@ void WeatherSensor::resetVecotrs()
     _hourRaport.erase(_hourRaport.begin(), _hourRaport.end());
 }
 
-string WeatherSensor::toString(float num)
+string WeatherSensor::toString(float num)const
 {
     stringstream ss;
     ss << num;

@@ -11,6 +11,7 @@ do raportowania i odczytywania temperatury, ciœnienia i wilgotnoœci.
 #include <tuple>
 #include "BME280.h"
 #include "DateTime.h"
+#include "BusyWaitThreadInterface.h"
 
 using namespace std;
 
@@ -24,8 +25,8 @@ Okresy czasu w sekundach
 #define HOUR 3600
 #define DAY 86400
 
-#define ROW 60;
-#define COL 24;
+#define ROW 60
+#define COL 24
 
 #define LOG_FILE_DAILY ((const char*)"logFileDaily.txt")
 #define LOG_FILE_INSTANT ((const char*)"logFileInstant.txt")
@@ -39,14 +40,15 @@ public:
 runThreadCollectData() ma za zadanie uruchomiæ  w¹tek w którym bêd¹ odczytywane i aktualizowane dane z czujnika BME280.
 Dane temperatury, ciœnienia i wilgotnoœci bêd¹ zapisywane w vectorze _secRaport jako tuple tych 3 wartoœci.
 */
-    TStatus runThreadCollectData() override;
-    TStatus stopThreadCollectData() override;
-    string getAvg(const vector<tuple<double, int, int> >& date, int num)const;
-	string getDataForEachHour(int i)const;
-	string getCurrentParam()const;
-    void make24HRaport()const;
-    void makeRaportNow()const;
-    void mailRaport()const;
+    int runThreadCollectData() override;
+    int stopThreadCollectData() override;
+    string getAvg(const vector<tuple<double, int, int> >& date, int num);
+	string getDataForEachHour(int i);
+	string getCurrentParam();
+    void make24HRaport();
+    void makeRaportNow();
+    void mailRaport();
+    bool getThreadFlag();
 /*!
 printSchema() Tworzy wykres graficzny na, którym mo¿na zaobserwowaæ zmiany temperatury.
 */
@@ -62,7 +64,7 @@ collectData() zbiera dane i zapisuje je co sekunde w wektorze _secRaport oraz co
 co 24 godziny czyœci wektory
 */
     void resetVecotrs();
-    string toString(float num);
+    string toString(float num)const;
 
 /*!
 _startHour i _startDay rozpoczynaj¹ mierzenie czasu po uruchomieniu czujnika i s¹ wykorzystywane do œledzenia czasu i wykonywania okresowych raportów.

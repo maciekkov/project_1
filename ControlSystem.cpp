@@ -1,27 +1,32 @@
 #include "ControlSystem.h"
 
-ControlSystem::ControlSystem():_gpioSetBotton(SET), _gpioUpBotton(UP), _gpioDownBotton(DOWN)
+using namespace std;
+
+ControlSystem::ControlSystem():_gpioSetBotton(SET), _gpioUpBotton(UP), _gpioDownBotton(DOWN) 
 {
     _gpioSetBotton.initGpio("in");
     _gpioUpBotton.initGpio("in");
     _gpioDownBotton.initGpio("in");
-    _isExit = false;
+     
 }
 
 void ControlSystem::run()
 {
-    user = thread(&ControlSystem::userSpace, this);
+	
+    _user = thread(&ControlSystem::userSpace, this);
     _sensor.runThreadCollectData();
 }
 
-int ControlSystem::checkBotton(uint32_t num)
+int ControlSystem::checkBotton(int num)
 {
     switch(num)
     {
     case SET:
+    cout<< "set"<<endl;
         return _gpioSetBotton.GgetValue();
         break;
     case UP:
+    cout<< "up"<<endl;
         return _gpioUpBotton.GgetValue();
         break;
     case DOWN:
@@ -32,52 +37,45 @@ int ControlSystem::checkBotton(uint32_t num)
     }
 }
 
-int ControlSystem::antyNois(uint32_t pin)
+int ControlSystem::antyNois(int num)
 {
-    if(checkBotton(pin))
+    if(!checkBotton(num))
     {
         this_thread::sleep_for(chrono::microseconds(SLEEP_2ms));
-        if(checkBotton(pin))
+        if(!checkBotton(num))
             return 0;
     }
     return 1;
 }
 
-void ControlSystem::userSpace( )
+void ControlSystem::userSpace()
 {
     int num = 0;
-    while(1)
+    while(!_sensor.getThreadFlag())
     {
-        if(checkBotton(SET))
-            if(!antyNois(SET))
-            {
-                writeOnScreenWithDelay(0, 0, menu.menuName().c_str(), SLEEP_1s);
-                while(1)
-                {
-                    this_thread::sleep_for(chrono::microseconds(SLEEP_5ms));;
-                    if(checkBotton(UP))
-                        if(!antyNois(UP))
-                        {
-                            ++num;
-                            if(num >= menu.getSizeVector())
-                                num = 0;
-                            writeOnScreen(0, 5, menu.getVectorName(num));
-                        }
-                    if(checkBotton(DOWN))
-                        if(!antyNois(DOWN))
-                        {
-                            --num;
-                            if(num < 0)
-                                num = menu.getSizeVector() - 1;
-                            writeOnScreen(0, 5, menu.getVectorName(num));
-                        }
-                    if(checkBotton(SET))
-                    {
-                        execution(menu.getVectorID(num));
-                    }
-                }
-            }
-    }
+		this_thread::sleep_for(chrono::microseconds(SLEEP_5ms));;
+        if(!checkBotton(UP))
+        if(!antyNois(UP))
+        {
+			++num;
+            if(num >= _menu.getSizeVector())
+               num = 0;
+            writeOnScreen(0, 5, _menu.getVectorName(num).c_str());
+         }
+         if(!checkBotton(DOWN))
+         if(!antyNois(DOWN))
+         {
+            --num;
+            if(num < 0)
+               num = _menu.getSizeVector() - 1;
+            writeOnScreen(0, 5, _menu.getVectorName(num).c_str());
+         }
+         if(!checkBotton(SET))
+         {
+            execution(_menu.getVectorID(num));
+         }
+     }
+    writeOnScreen(0, 5, GOODBYE);
 }
 
 void ControlSystem::execution(int numID)
@@ -91,7 +89,7 @@ void ControlSystem::execution(int numID)
         writeOnScreenWithDelay(0, 5, _sensor.log.getDate().c_str(), SLEEP_1s);
         break;
     case 3:
-        writeOnScreenWithDelay(0, 0, _sensor.getCurrentParam());
+        writeOnScreenWithDelay(0, 0, _sensor.getCurrentParam().c_str(), SLEEP_1s);
         break;
     case 4:
         _sensor.mailRaport();
@@ -110,5 +108,5 @@ void ControlSystem::execution(int numID)
 
 ControlSystem::~ControlSystem()
 {
-    user.join();
+    _user.join();
 }

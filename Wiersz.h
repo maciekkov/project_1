@@ -15,8 +15,8 @@ class Wiersz
 public:
 	Wiersz(){}
 	Wiersz(string name, int numID);
-	string getWierszName()const;
-	int getNumID()const;
+	string getWierszName();
+	int getNumID();
 private:
 	string _wierszName;
 	int _numID;

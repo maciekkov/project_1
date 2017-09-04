@@ -7,11 +7,13 @@ Wiersz::Wiersz(string name, int numID)
     _wierszName = name;
     _numID = numID;
 }
-inline string getWierszName()const
+
+string Wiersz::getWierszName()
 {
     return _wierszName;
 }
-inline int getNumID()const
+
+int Wiersz::getNumID()
 {
     return _numID;
 }

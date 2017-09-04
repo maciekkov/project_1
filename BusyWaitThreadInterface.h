@@ -1,20 +1,16 @@
 #ifndef BUSYWAITTHREADINTERFACE_H
 #define BUSYWAITTHREADINTERFACE_H
 #include <atomic>
-
+#include <thread>
 class BusyWaitThreadInterface
 {
 public:
-    enum TStatus
-    {
-        OK,
-        BAD
-    };
-    BusyWaitThreadInterface();
-    virtual ~BusyWaitThreadInterface();
 
-    virtual runThreadCollectData() = 0;
-    virtual stopThreadCollectData() = 0;
+    BusyWaitThreadInterface(){}
+    virtual ~BusyWaitThreadInterface(){}
+
+    virtual int runThreadCollectData() = 0;
+    virtual int stopThreadCollectData() = 0;
 
 protected:
     std::thread _thread;

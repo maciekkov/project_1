@@ -1,11 +1,4 @@
 #include "BusyWaitThreadInterface.h"
 
-BusyWaitThreadInterface::BusyWaitThreadInterface()
-{
-    //ctor
-}
+using namespace std;
 
-BusyWaitThreadInterface::~BusyWaitThreadInterface()
-{
-    //dtor
-}

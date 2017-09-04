@@ -17,7 +17,7 @@ class DateTime
 {
 public:
     DateTime();
-    ~DateTime();
+    virtual ~DateTime(){}
 /*!
 Zestaw fukncji daj¹cych nam czêœci daty i czasu do dyspozycji.
 */
@@ -32,8 +32,8 @@ Zestaw fukncji daj¹cych nam czêœci daty i czasu do dyspozycji.
 GetTime() zwraca jako string kompletn¹ godzinê w Formacie HH:MM:SS
 GetDate() zwraca jako string kompletn¹ datê w formacie DD:MM:YY
 */
-    string getTime()const;
-    string getDate()const;
+    string getTime();
+    string getDate();
 /*!
  logUpdate() Dziêki tej funkcji tworzymy ró¿nego rodzaju logFile b¹dŸ aktualizujemy ju¿ istiej¹ce.
 */
